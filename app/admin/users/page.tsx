@@ -43,7 +43,7 @@ export default function UsersPage() {
     ) => {
       try {
         const res = await fetch(
-          `${baseUrl}/auth/logoutadmin/users?role=${role}`,
+          `${baseUrl}/admin/users?role=${role}`,
           { credentials: "include" }
         );
         const data = await res.json();

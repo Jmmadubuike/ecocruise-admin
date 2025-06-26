@@ -3,8 +3,24 @@ import { useEffect, useState } from "react";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+interface TicketUser {
+  _id: string;
+  name: string;
+  // Add other user properties as needed
+}
+
+interface Ticket {
+  _id: string;
+  subject: string;
+  status: "open" | "closed" | "pending";
+  createdAt: string;
+  updatedAt?: string;
+  user?: TicketUser;
+  // Add other ticket properties as needed
+}
+
 export default function TicketsPage() {
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [role, setRole] = useState<"customer" | "driver">("customer");
@@ -15,17 +31,30 @@ export default function TicketsPage() {
         setLoading(true);
         setError("");
 
+        if (!baseUrl) {
+          throw new Error("API base URL is not configured");
+        }
+
         const res = await fetch(
           `${baseUrl}/admin/support-tickets?role=${role}`,
           {
             credentials: "include",
           }
         );
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to load tickets");
+        }
+
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to load tickets");
         setTickets(data.data || data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred");
+        }
         setTickets([]);
       } finally {
         setLoading(false);
@@ -37,11 +66,16 @@ export default function TicketsPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-semibold mb-6 text-[#004aad]">Support Tickets</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-[#004aad]">
+        Support Tickets
+      </h1>
 
       {/* Role Filter */}
       <div className="mb-6">
-        <label htmlFor="role" className="block mb-2 font-semibold text-gray-700">
+        <label
+          htmlFor="role"
+          className="block mb-2 font-semibold text-gray-700"
+        >
           Filter Tickets by Role
         </label>
         <select
@@ -60,7 +94,9 @@ export default function TicketsPage() {
       ) : error ? (
         <div className="text-[#f80b0b] font-semibold">{error}</div>
       ) : tickets.length === 0 ? (
-        <div className="text-gray-500 font-medium">No {role} tickets found.</div>
+        <div className="text-gray-500 font-medium">
+          No {role} tickets found.
+        </div>
       ) : (
         <table className="table w-full border border-gray-300 rounded-lg overflow-hidden">
           <thead className="bg-[#004aad] text-white">
@@ -86,7 +122,8 @@ export default function TicketsPage() {
                       : "text-green-600"
                   }`}
                 >
-                  {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                  {ticket.status.charAt(0).toUpperCase() +
+                    ticket.status.slice(1)}
                 </td>
                 <td className="py-2 px-4">
                   {new Date(ticket.createdAt).toLocaleDateString()}

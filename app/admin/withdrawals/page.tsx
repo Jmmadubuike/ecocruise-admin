@@ -3,7 +3,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { FiCheck, FiX, FiLoader } from "react-icons/fi";
-import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
 
@@ -25,8 +24,6 @@ interface Withdrawal {
 }
 
 export default function WithdrawalsPage() {
-  const { user } = useAuth();
-  console.log(user.name);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("pending");
@@ -41,7 +38,7 @@ export default function WithdrawalsPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/withdrawals?status=${status}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/withdrawals?status=${status}`,
         {
           credentials: "include",
         }
@@ -61,13 +58,15 @@ export default function WithdrawalsPage() {
     }
   };
 
-  const debouncedFetch = useRef(
-    debounce((status) => fetchWithdrawals(status), 300)
-  ).current;
+  const debouncedFetch = useRef<(status: string) => void>(
+  debounce((status: string) => {
+    fetchWithdrawals(status);
+  }, 300)
+).current;
 
   const updateStatus = async (id: string, action: "approve" | "reject") => {
     try {
-      const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/withdrawals/${id}/${action}`;
+      const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/withdrawals/${id}/${action}`;
       const res = await fetch(endpoint, {
         method: "PATCH",
         credentials: "include",

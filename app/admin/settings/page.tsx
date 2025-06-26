@@ -49,8 +49,12 @@ export default function AdminSettingsPage() {
           email: data.email || "",
           phone: data.phone || "",
         });
-      } catch (error: any) {
-        toast.error(error.message || "Error loading profile");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error.message || "Error loading profile");
+        } else {
+          toast.error("An unexpected error occurred");
+        }
       } finally {
         setLoadingProfile(false);
       }
@@ -138,7 +142,9 @@ export default function AdminSettingsPage() {
   };
 
   if (loadingProfile) {
-    return <div className="p-6 text-center text-gray-600">Loading profile...</div>;
+    return (
+      <div className="p-6 text-center text-gray-600">Loading profile...</div>
+    );
   }
 
   return (
@@ -219,7 +225,10 @@ export default function AdminSettingsPage() {
         <h2 className="text-xl font-semibold mb-4">Change Password</h2>
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
-            <label htmlFor="currentPassword" className="block font-semibold mb-1">
+            <label
+              htmlFor="currentPassword"
+              className="block font-semibold mb-1"
+            >
               Current Password
             </label>
             <input
@@ -251,7 +260,10 @@ export default function AdminSettingsPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block font-semibold mb-1">
+            <label
+              htmlFor="confirmPassword"
+              className="block font-semibold mb-1"
+            >
               Confirm New Password
             </label>
             <input

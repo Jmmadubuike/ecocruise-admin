@@ -10,24 +10,32 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const { fetchUser } = useAuth();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/login`, {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setError(""); // clear previous errors
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
-    if (res.ok) {
-      // Fetch fresh user data immediately after login
-      await fetchUser();
-      router.push("/admin/dashboard");
-    } else {
+    if (!res.ok) {
       const data = await res.json();
-      setError(data.error || "Login failed");
+      throw new Error(data.error || "Login failed");
     }
-  };
+
+    await fetchUser(); // Refresh authenticated user
+    router.push("/admin/dashboard");
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "An unexpected error occurred";
+    setError(message);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200">
