@@ -1,10 +1,17 @@
-// next.config.ts
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true, // Skip ESLint errors
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true, // Skip TypeScript errors
+    ignoreBuildErrors: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/:path*',
+        destination: '/',
+      },
+    ];
   },
 };
 
