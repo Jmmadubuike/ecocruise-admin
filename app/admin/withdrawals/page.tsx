@@ -26,6 +26,7 @@ interface Withdrawal {
 
 export default function WithdrawalsPage() {
   const { user } = useAuth();
+  console.log(user.name);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("pending");

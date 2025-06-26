@@ -49,8 +49,12 @@ export default function UsersPage() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || `Failed to load ${role}s`);
         setter(data.data || data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }
       }
     };
 
@@ -75,15 +79,12 @@ export default function UsersPage() {
   const toggleBan = async (user: User) => {
     const shouldBan = !user.isBanned;
     try {
-      const res = await fetch(
-        `${baseUrl}/admin/users/${user._id}/ban`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ isBanned: shouldBan }),
-        }
-      );
+      const res = await fetch(`${baseUrl}/admin/users/${user._id}/ban`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isBanned: shouldBan }),
+      });
 
       if (!res.ok) throw new Error("Failed to update user ban status");
 
@@ -91,15 +92,21 @@ export default function UsersPage() {
 
       // Update user lists optimistically
       const updateUserList = (list: User[]) =>
-        list.map((u) => (u._id === user._id ? { ...u, isBanned: shouldBan } : u));
+        list.map((u) =>
+          u._id === user._id ? { ...u, isBanned: shouldBan } : u
+        );
       setCustomers((prev) => updateUserList(prev));
       setDrivers((prev) => updateUserList(prev));
       setAdmins((prev) => updateUserList(prev));
 
       // Update modal user state
       setSelectedUser({ ...user, isBanned: shouldBan });
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Something went wrong");
+      }
     }
   };
 
@@ -111,7 +118,10 @@ export default function UsersPage() {
       </h2>
       <div className="overflow-x-auto">
         <table className="table table-zebra w-full min-w-[900px]">
-          <thead className="sticky top-0" style={{ backgroundColor: "#004aad" }}>
+          <thead
+            className="sticky top-0"
+            style={{ backgroundColor: "#004aad" }}
+          >
             <tr>
               <th className="text-white cursor-default">Name</th>
               <th className="text-white cursor-default">Username</th>
@@ -166,9 +176,13 @@ export default function UsersPage() {
                   </td>
                   <td>
                     {user.isOnline ? (
-                      <span className="badge bg-green-600 text-white">Online</span>
+                      <span className="badge bg-green-600 text-white">
+                        Online
+                      </span>
                     ) : (
-                      <span className="badge bg-red-600 text-white">Offline</span>
+                      <span className="badge bg-red-600 text-white">
+                        Offline
+                      </span>
                     )}
                   </td>
                   <td>{formatCurrency(user.wallet)}</td>
