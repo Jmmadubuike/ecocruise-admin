@@ -9,12 +9,14 @@ import {
   TicketIcon,
   ChartBarIcon,
   BanknotesIcon,
+  WalletIcon,
 } from "@heroicons/react/24/outline";
 
 const navLinks = [
   { label: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
   { label: "Routes", href: "/admin/routes", icon: MapIcon },
   { label: "Users", href: "/admin/users", icon: UsersIcon },
+  { label: "Wallet Update", href: "/admin/wallet", icon: WalletIcon },
   { label: "Tickets", href: "/admin/tickets", icon: TicketIcon },
   { label: "Analytics", href: "/admin/analytics", icon: ChartBarIcon },
   { label: "Withdrawals", href: "/admin/withdrawals", icon: BanknotesIcon },

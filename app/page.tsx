@@ -48,13 +48,21 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Call-to-action */}
-        <button
-          onClick={() => router.push("/login")}
-          className="btn btn-primary mt-8 px-6 py-3 text-lg font-semibold shadow-md hover:shadow-lg"
-        >
-          Enter Admin Panel
-        </button>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+          <button
+            onClick={() => router.push("/login")}
+            className="bg-[#004aad] text-white px-6 py-3 text-lg font-semibold rounded hover:bg-[#00328a] transition"
+          >
+            Enter Customer Portal
+          </button>
+          <button
+            onClick={() => router.push("/register")}
+            className="border border-[#004aad] text-[#004aad] px-6 py-3 text-lg font-semibold rounded hover:bg-[#004aad] hover:text-white transition"
+          >
+            Register
+          </button>
+        </div>
       </div>
     </div>
   );

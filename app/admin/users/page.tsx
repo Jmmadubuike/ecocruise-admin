@@ -43,7 +43,7 @@ export default function UsersPage() {
     ) => {
       try {
         const res = await fetch(
-          `${baseUrl}/admin/users?role=${role}`,
+          `${baseUrl}/api/v1/admin/users?role=${role}`,
           { credentials: "include" }
         );
         const data = await res.json();
@@ -79,7 +79,7 @@ export default function UsersPage() {
   const toggleBan = async (user: User) => {
     const shouldBan = !user.isBanned;
     try {
-      const res = await fetch(`${baseUrl}/admin/users/${user._id}/ban`, {
+      const res = await fetch(`${baseUrl}/api/v1/admin/users/${user._id}/ban`, {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

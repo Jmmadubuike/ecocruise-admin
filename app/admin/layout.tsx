@@ -18,6 +18,7 @@ import {
   FiSettings,
   FiX,
 } from "react-icons/fi";
+import { FiCreditCard } from "react-icons/fi";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -25,6 +26,7 @@ const navLinks = [
   { label: "Dashboard", href: "/admin/dashboard", icon: <FiHome className="w-5 h-5" /> },
   { label: "Routes", href: "/admin/routes", icon: <FiMap className="w-5 h-5" /> },
   { label: "Users", href: "/admin/users", icon: <FiUsers className="w-5 h-5" /> },
+  { label: "Wallet Update", href: "/admin/wallet", icon: <FiCreditCard className="w-5 h-5" /> },
   { label: "Tickets", href: "/admin/tickets", icon: <FiTruck className="w-5 h-5" /> },
   { label: "Analytics", href: "/admin/analytics", icon: <FiPieChart className="w-5 h-5" /> },
   { label: "Withdrawals", href: "/admin/withdrawals", icon: <FiDollarSign className="w-5 h-5" /> },

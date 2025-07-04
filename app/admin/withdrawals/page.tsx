@@ -38,7 +38,7 @@ export default function WithdrawalsPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/withdrawals?status=${status}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/withdrawals?status=${status}`,
         {
           credentials: "include",
         }
@@ -66,7 +66,7 @@ export default function WithdrawalsPage() {
 
   const updateStatus = async (id: string, action: "approve" | "reject") => {
     try {
-      const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/withdrawals/${id}/${action}`;
+      const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/withdrawals/${id}/${action}`;
       const res = await fetch(endpoint, {
         method: "PATCH",
         credentials: "include",

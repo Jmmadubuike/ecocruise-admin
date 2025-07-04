@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { toast } from "react-hot-toast";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -45,7 +46,7 @@ export default function AdminTicketsPage() {
       setError("");
       if (!baseUrl) throw new Error("API base URL is not configured");
 
-      const url = new URL(`${baseUrl}/support/admin`);
+      const url = new URL(`${baseUrl}/api/v1/support/admin`);
       if (statusFilter) url.searchParams.append("status", statusFilter);
 
       const res = await fetch(url.toString(), { credentials: "include" });
@@ -88,7 +89,11 @@ export default function AdminTicketsPage() {
 
   const handleReplySubmit = async (ticketId: string) => {
     const message = replyTexts[ticketId]?.trim();
-    if (!message && (statusEdits[ticketId] === undefined || statusEdits[ticketId] === tickets.find(t => t._id === ticketId)?.status)) {
+    if (
+      !message &&
+      (statusEdits[ticketId] === undefined ||
+        statusEdits[ticketId] === tickets.find(t => t._id === ticketId)?.status)
+    ) {
       return;
     }
 
@@ -97,7 +102,7 @@ export default function AdminTicketsPage() {
 
     try {
       if (message) {
-        const replyRes = await fetch(`${baseUrl}/support/admin/${ticketId}/respond`, {
+        const replyRes = await fetch(`${baseUrl}/api/v1/support/admin/${ticketId}/respond`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -109,8 +114,11 @@ export default function AdminTicketsPage() {
         }
       }
 
-      if (statusEdits[ticketId] && statusEdits[ticketId] !== tickets.find(t => t._id === ticketId)?.status) {
-        const patchRes = await fetch(`${baseUrl}/support/admin/${ticketId}/status`, {
+      if (
+        statusEdits[ticketId] &&
+        statusEdits[ticketId] !== tickets.find(t => t._id === ticketId)?.status
+      ) {
+        const patchRes = await fetch(`${baseUrl}/api/v1/support/admin/${ticketId}/status`, {
           method: "PATCH",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -125,9 +133,12 @@ export default function AdminTicketsPage() {
       await fetchTickets();
       setReplyTexts(prev => ({ ...prev, [ticketId]: "" }));
       setStatusEdits(prev => ({ ...prev, [ticketId]: "" }));
+
+      toast.success("Reply and/or status updated successfully.");
     } catch (err: unknown) {
       if (err instanceof Error) setSubmitError(err.message);
-      else setSubmitError("An unexpected error occurred while submitting reply or updating status.");
+      else
+        setSubmitError("An unexpected error occurred while submitting reply or updating status.");
     } finally {
       setSubmittingId(null);
     }
@@ -138,7 +149,10 @@ export default function AdminTicketsPage() {
       <h1 className="text-3xl font-bold mb-6 text-[#004aad]">Support Tickets (Admin)</h1>
 
       <div className="mb-6 max-w-xs">
-        <label htmlFor="statusFilter" className="block mb-2 font-semibold text-gray-700">
+        <label
+          htmlFor="statusFilter"
+          className="block mb-2 font-semibold text-gray-700"
+        >
           Filter by Status
         </label>
         <select
@@ -148,38 +162,50 @@ export default function AdminTicketsPage() {
           className="select select-bordered w-full text-[#004aad] focus:outline-none focus:ring-2 focus:ring-[#004aad]"
         >
           <option value="">All</option>
-          {validStatuses.map(status => (
-            <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+          {validStatuses.map((status) => (
+            <option key={status} value={status}>
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </option>
           ))}
         </select>
       </div>
 
       {loading && (
-        <div className="text-[#004aad] font-semibold animate-pulse py-6">Loading tickets...</div>
+        <div className="text-[#004aad] font-semibold animate-pulse py-6">
+          Loading tickets...
+        </div>
       )}
-      {error && (
-        <div className="text-red-600 font-semibold py-6">{error}</div>
-      )}
+      {error && <div className="text-red-600 font-semibold py-6">{error}</div>}
       {!loading && !error && tickets.length === 0 && (
         <div className="text-gray-500 font-medium py-6 text-center">No tickets found.</div>
       )}
 
       <div className="space-y-4">
-        {tickets.map(ticket => (
+        {tickets.map((ticket) => (
           <div
             key={ticket._id}
             className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer" onClick={() => toggleExpand(ticket._id)}>
+            <div
+              className="flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer"
+              onClick={() => toggleExpand(ticket._id)}
+            >
               <div>
                 <div className="font-bold text-[#004aad]">{ticket.subject}</div>
-                <div className="text-sm text-gray-600">By: {ticket.user?.name || "Unknown"} • {new Date(ticket.createdAt).toLocaleDateString()}</div>
+                <div className="text-sm text-gray-600">
+                  By: {ticket.user?.name || "Unknown"} •{" "}
+                  {new Date(ticket.createdAt).toLocaleDateString()}
+                </div>
               </div>
               <div className="flex items-center mt-2 sm:mt-0">
                 <span className="text-sm font-semibold px-2 py-1 rounded bg-[#004aad]/10 text-[#004aad] mr-3">
                   {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
                 </span>
-                {expandedIds.has(ticket._id) ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
+                {expandedIds.has(ticket._id) ? (
+                  <FiChevronUp size={20} />
+                ) : (
+                  <FiChevronDown size={20} />
+                )}
               </div>
             </div>
 
@@ -191,17 +217,21 @@ export default function AdminTicketsPage() {
               {/* Responses */}
               {ticket.responses && ticket.responses.length > 0 && (
                 <div className="mb-4 border rounded p-3 bg-gray-50 max-h-48 overflow-y-auto">
-                  {ticket.responses.map(resp => (
+                  {ticket.responses.map((resp) => (
                     <div key={resp._id} className="mb-3">
-                      <div className="text-sm font-semibold text-[#004aad]">{resp.responder?.name || "Support"}</div>
+                      <div className="text-sm font-semibold text-[#004aad]">
+                        {resp.responder?.name || "Support"}
+                      </div>
                       <div className="text-sm">{resp.message}</div>
-                      <div className="text-xs text-gray-400">{new Date(resp.createdAt).toLocaleString()}</div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(resp.createdAt).toLocaleString()}
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* Reply Form */}
+              {/* Reply Form and Status Update */}
               <textarea
                 placeholder="Write your reply here..."
                 rows={3}
@@ -211,37 +241,55 @@ export default function AdminTicketsPage() {
                 disabled={submittingId === ticket._id}
               />
 
-              <label className="block mb-2 font-semibold text-gray-700" htmlFor={`status-select-${ticket._id}`}>
+              <label
+                className="block mb-2 font-semibold text-gray-700"
+                htmlFor={`status-select-${ticket._id}`}
+              >
                 Update Status
               </label>
-              <select
-                id={`status-select-${ticket._id}`}
-                value={statusEdits[ticket._id] ?? ticket.status}
-                onChange={(e) => handleStatusChange(ticket._id, e.target.value)}
-                className="select select-bordered w-48 mb-4 text-[#004aad]"
-                disabled={submittingId === ticket._id || ticket.status === "closed"}
-              >
-                {validStatuses.map(status => (
-                  <option key={status} value={status} disabled={ticket.status === "closed"}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </option>
-                ))}
-              </select>
+
+              <div className="flex items-center space-x-4">
+                <select
+                  id={`status-select-${ticket._id}`}
+                  value={statusEdits[ticket._id] ?? ticket.status}
+                  onChange={(e) => handleStatusChange(ticket._id, e.target.value)}
+                  className="select select-bordered w-48 mb-0 text-[#004aad]"
+                  disabled={submittingId === ticket._id || ticket.status === "closed"}
+                >
+                  {validStatuses.map((status) => (
+                    <option
+                      key={status}
+                      value={status}
+                      disabled={ticket.status === "closed"}
+                    >
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  className={`w-48 px-4 py-2 rounded-md font-semibold transition-colors duration-200 ${
+                    submittingId === ticket._id
+                      ? "bg-[#004aad]/70 cursor-not-allowed text-white"
+                      : "bg-[#004aad] hover:bg-[#f80b0b] text-white"
+                  }`}
+                  onClick={() => handleReplySubmit(ticket._id)}
+                  disabled={
+                    submittingId === ticket._id ||
+                    (!replyTexts[ticket._id]?.trim() &&
+                      (statusEdits[ticket._id] === undefined ||
+                        statusEdits[ticket._id] === ticket.status))
+                  }
+                >
+                  {submittingId === ticket._id
+                    ? "Submitting..."
+                    : "Submit Reply & Status"}
+                </button>
+              </div>
 
               {submitError && submittingId === ticket._id && (
-                <p className="text-red-600 mb-2">{submitError}</p>
+                <p className="text-red-600 mt-2">{submitError}</p>
               )}
-
-              <button
-                className="btn btn-primary"
-                onClick={() => handleReplySubmit(ticket._id)}
-                disabled={
-                  submittingId === ticket._id ||
-                  (!replyTexts[ticket._id]?.trim() && (statusEdits[ticket._id] === undefined || statusEdits[ticket._id] === ticket.status))
-                }
-              >
-                {submittingId === ticket._id ? "Submitting..." : "Submit Reply & Status"}
-              </button>
             </div>
           </div>
         ))}

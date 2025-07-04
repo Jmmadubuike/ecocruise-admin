@@ -102,11 +102,11 @@ export default function AdminDashboard() {
         usersData,
         routesData,
       ] = await Promise.all([
-        fetchWithCookies(`${baseUrl}/admin/analytics`),
-        fetchWithCookies(`${baseUrl}/admin/withdrawals?status=pending`),
-        fetchWithCookies(`${baseUrl}/admin/support-tickets?status=pending`),
-        fetchWithCookies(`${baseUrl}/admin/users?role=customer&limit=5`),
-        fetchWithCookies(`${baseUrl}/admin/routes?limit=5`),
+        fetchWithCookies(`${baseUrl}/api/v1/admin/analytics`),
+        fetchWithCookies(`${baseUrl}/api/v1/admin/withdrawals?status=pending`),
+        fetchWithCookies(`${baseUrl}/api/v1/admin/support-tickets?limit=5`),
+        fetchWithCookies(`${baseUrl}/api/v1/admin/users?role=customer&limit=5`),
+        fetchWithCookies(`${baseUrl}/api/v1/admin/routes?limit=5`),
       ]);
 
       setDashboardData({
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
     const path =
       action.type === "withdrawal"
         ? `/admin/withdrawals/${action.id}`
-        : `/admin/support-tickets/${action.id}`;
+        : `/admin/tickets`;
     router.push(path);
   };
 

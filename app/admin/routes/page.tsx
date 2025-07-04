@@ -27,7 +27,7 @@ export default function AdminRoutesPage() {
 
   useEffect(() => {
     if (user && user.role === "admin") {
-      fetch(`${baseUrl}/admin/routes`, {
+      fetch(`${baseUrl}/api/v1/admin/routes`, {
         credentials: "include",
       })
         .then((res) => res.json())
@@ -44,7 +44,7 @@ export default function AdminRoutesPage() {
 
     try {
       const res = await fetch(
-        `${baseUrl}/admin/routes/${id}`,
+        `${baseUrl}/api/v1/admin/routes/${id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -73,7 +73,7 @@ export default function AdminRoutesPage() {
     }
 
     try {
-      const res = await fetch(`${baseUrl}/admin/routes`, {
+      const res = await fetch(`${baseUrl}/api/v1/admin/routes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

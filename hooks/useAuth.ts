@@ -9,7 +9,7 @@ export default function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${baseUrl}/auth/me`, { credentials: "include" })
+    fetch(`${baseUrl}/api/v1/auth/me`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (data.user) setUser(data.user);

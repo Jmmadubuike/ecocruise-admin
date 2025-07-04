@@ -75,10 +75,10 @@ export default function AdminAnalyticsPage() {
       else if (fromDate && toDate) query = `?from=${fromDate}&to=${toDate}`;
 
       const [customersRes, adminsRes, driversRes, bannedRes] = await Promise.all([
-        fetch(`${baseUrl}/admin/users?role=customer`, { credentials: "include" }),
-        fetch(`${baseUrl}/admin/users?role=admin`, { credentials: "include" }),
-        fetch(`${baseUrl}/admin/users?role=driver`, { credentials: "include" }),
-        fetch(`${baseUrl}/admin/users/banned?isBanned=true`, { credentials: "include" }),
+        fetch(`${baseUrl}/api/v1/admin/users?role=customer`, { credentials: "include" }),
+        fetch(`${baseUrl}/api/v1/admin/users?role=admin`, { credentials: "include" }),
+        fetch(`${baseUrl}/api/v1/admin/users?role=driver`, { credentials: "include" }),
+        fetch(`${baseUrl}/api/v1/admin/users/banned?isBanned=true`, { credentials: "include" }),
       ]);
 
       const [customers, admins, drivers, banned] = await Promise.all([
@@ -88,17 +88,17 @@ export default function AdminAnalyticsPage() {
         bannedRes.json(),
       ]);
 
-      const analyticsRes = await fetch(`${baseUrl}/admin/analytics${query}`, {
+      const analyticsRes = await fetch(`${baseUrl}/api/v1/admin/analytics${query}`, {
         credentials: "include",
       });
       const analyticsData: { data: AnalyticsData } = await analyticsRes.json();
 
-      const withdrawalsRes = await fetch(`${baseUrl}/admin/withdrawals`, {
+      const withdrawalsRes = await fetch(`${baseUrl}/api/v1/admin/withdrawals`, {
         credentials: "include",
       });
       const withdrawalsData: { amount: number; status: string }[] = await withdrawalsRes.json();
 
-      const routesRes = await fetch(`${baseUrl}/admin/routes`, {
+      const routesRes = await fetch(`${baseUrl}/api/v1/admin/routes`, {
         credentials: "include",
       });
       const routesData = await routesRes.json();
