@@ -59,22 +59,47 @@ export default function WithdrawalsPage() {
   };
 
   const debouncedFetch = useRef<(status: string) => void>(
-  debounce((status: string) => {
-    fetchWithdrawals(status);
-  }, 300)
-).current;
+    debounce((status: string) => {
+      fetchWithdrawals(status);
+    }, 300)
+  ).current;
 
-  const updateStatus = async (id: string, action: "approve" | "reject") => {
+  const updateStatus = async (
+    id: string,
+    action: "approve" | "reject",
+    note?: string // optional note for rejection
+  ) => {
     try {
       const endpoint = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/withdrawals/${id}/${action}`;
-      const res = await fetch(endpoint, {
+
+      const options: RequestInit = {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-      });
-      if (res.ok) fetchWithdrawals(statusFilter);
+      };
+
+      // 👇 Send note only if rejecting
+      if (action === "reject") {
+        options.body = JSON.stringify({ note: note || "Rejected by admin" });
+      }
+
+      const res = await fetch(endpoint, options);
+
+      if (res.ok) {
+        toast.success(`Withdrawal ${action}d successfully`);
+
+        // Clear cached list
+        delete cache.current[statusFilter];
+
+        // Refetch updated data
+        fetchWithdrawals(statusFilter);
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData?.error || `Failed to ${action} withdrawal`);
+      }
     } catch (err) {
       console.error(`Error updating withdrawal ${action}:`, err);
+      toast.error(`Error: Could not ${action} withdrawal`);
     }
   };
 
