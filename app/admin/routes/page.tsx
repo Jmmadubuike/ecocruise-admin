@@ -124,7 +124,7 @@ export default function AdminRoutesPage() {
     if (!editingRoute) return;
 
     try {
-      const res = await fetch(`${baseUrl}/admin/routes/${editingRoute._id}`, {
+      const res = await fetch(`${baseUrl}/api/v1/admin/routes/${editingRoute._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
