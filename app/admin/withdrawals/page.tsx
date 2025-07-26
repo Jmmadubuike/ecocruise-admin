@@ -13,8 +13,8 @@ interface Withdrawal {
   method?: string;
   note?: string;
   driver: {
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
     email: string;
     phone: string;
     earnings: {
@@ -152,7 +152,7 @@ export default function WithdrawalsPage() {
               {withdrawals.map((w) => (
                 <tr key={w._id} className="border-t">
                   <td className="px-4 py-3">
-                    {w.driver.firstname} {w.driver.lastname}
+                    {w.driver.firstName} {w.driver.lastName}
                   </td>
                   <td className="px-4 py-3">₦{w.amount.toLocaleString()}</td>
                   <td className="px-4 py-3">
