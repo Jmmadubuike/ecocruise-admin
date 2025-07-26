@@ -1,4 +1,6 @@
-// context/ToastContext.tsx
+"use client";
+
+
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 type ToastType = "success" | "error";
