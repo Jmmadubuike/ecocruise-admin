@@ -118,24 +118,24 @@ export default function AdminDashboard() {
               usersData?.length ??
               usersData?.data?.length ??
               0,
-            icon: <FiUsers className="w-6 h-6 text-[#004aad]" />,
+            icon: <FiUsers className="w-6 h-6 text-white" />,
           },
           {
             title: "Revenue",
             value: `₦${(
               analyticsData?.data?.totalRevenue || 0
             ).toLocaleString()}`,
-            icon: <FiDollarSign className="w-6 h-6 text-[#004aad]" />,
+            icon: <FiDollarSign className="w-6 h-6 text-white" />,
           },
           {
             title: "Active Routes",
             value: routesData?.length || routesData?.data?.length || 0,
-            icon: <FiMap className="w-6 h-6 text-[#004aad]" />,
+            icon: <FiMap className="w-6 h-6 text-white" />,
           },
           {
             title: "Total Trips",
             value: analyticsData?.data?.totalRides || 0,
-            icon: <FiTruck className="w-6 h-6 text-[#004aad]" />,
+            icon: <FiTruck className="w-6 h-6 text-white" />,
           },
         ],
         recentActivities: [
@@ -144,14 +144,18 @@ export default function AdminDashboard() {
             user: user.name || user.email || "Unknown",
             action: "Created account",
             time: "Recently",
-            icon: <FiUser className="text-[#004aad]" />,
+            icon: (
+              <FiUser className="text-white bg-[#004aad] rounded-full p-1 w-6 h-6" />
+            ),
           })) ?? []),
           ...(ticketsData?.data?.slice(0, 2).map((ticket: any) => ({
             id: ticket._id,
             user: ticket.user?.name || "User",
             action: `Submitted ticket: ${ticket.subject}`,
             time: new Date(ticket.createdAt).toLocaleTimeString(),
-            icon: <FiAlertCircle className="text-[#f80b0b]" />,
+            icon: (
+              <FiAlertCircle className="text-white bg-[#f80b0b] rounded-full p-1 w-6 h-6" />
+            ),
           })) ?? []),
         ],
         pendingActions: [
@@ -206,11 +210,11 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="alert shadow-lg mt-10 mx-auto w-full max-w-3xl p-4 rounded flex items-center gap-3 bg-red-600 text-white">
+      <div className="mt-10 mx-auto w-full max-w-3xl p-4 rounded shadow-lg flex items-center gap-3 bg-[#f80b0b] text-white border-l-8 border-white">
         <FiAlertCircle className="text-xl" />
         <span>Error loading dashboard: {error}</span>
         <button
-          className="btn btn-sm border-white text-red-600 bg-white font-bold"
+          className="btn btn-sm border-white text-[#f80b0b] bg-white font-bold"
           onClick={fetchDashboardData}
         >
           Retry
@@ -225,7 +229,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <section className="p-6 space-y-8 max-w-screen-xl mx-auto">
+    <section className="p-6 space-y-8 max-w-screen-xl mx-auto bg-gradient-to-br from-[#f0f8ff] via-white to-[#f0f8ff]">
       <div className="flex justify-between items-center">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-[#004aad]">
@@ -245,14 +249,22 @@ export default function AdminDashboard() {
         {dashboardData.stats.map((stat, idx) => (
           <div
             key={idx}
-            className="bg-base-100 shadow-lg rounded-xl p-5 flex items-center border border-[#004aad]"
+            className="bg-white shadow-lg rounded-xl p-5 flex items-center"
           >
-            <div className="p-3 rounded-full mr-4 bg-[#004aad1a] text-[#004aad]">
+            <div
+              className={`p-3 rounded-full mr-4 ${
+                stat.title === "Revenue" ? "bg-[#f80b0b]" : "bg-[#004aad]"
+              }`}
+            >
               {stat.icon}
             </div>
             <div>
               <p className="text-sm text-gray-500">{stat.title}</p>
-              <p className="text-2xl font-bold mt-1 text-[#004aad]">
+              <p
+                className={`text-2xl font-bold mt-1 ${
+                  stat.title === "Revenue" ? "text-[#f80b0b]" : "text-[#004aad]"
+                }`}
+              >
                 {stat.value}
               </p>
             </div>
@@ -261,8 +273,8 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-base-100 rounded-xl shadow p-6 border border-[#004aad]">
-          <h2 className="text-xl font-semibold mb-4 text-[#004aad]">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow p-6 border border-[#004aad]">
+          <h2 className="text-xl font-bold mb-4 text-[#004aad] border-b-2 border-[#004aad] pb-2">
             Recent Activities
           </h2>
           <div className="space-y-4">
@@ -291,8 +303,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-base-100 rounded-xl shadow p-6 border border-[#004aad]">
-          <h2 className="text-xl font-semibold mb-4 text-[#004aad]">
+        <div className="bg-white rounded-xl shadow p-6 border border-[#004aad]">
+          <h2 className="text-xl font-bold mb-4 text-[#004aad] border-b-2 border-[#004aad] pb-2">
             Pending Actions ({dashboardData.pendingActions.length})
           </h2>
           <div className="space-y-4">
@@ -305,7 +317,11 @@ export default function AdminDashboard() {
                   <p className="text-sm text-gray-700">{item.title}</p>
                   <button
                     onClick={() => handleActionClick(item)}
-                    className="btn btn-xs btn-outline border-[#004aad] text-[#004aad] font-semibold"
+                    className={`btn btn-xs font-semibold ${
+                      item.type === "ticket"
+                        ? "border-[#f80b0b] text-[#f80b0b]"
+                        : "border-[#004aad] text-[#004aad]"
+                    }`}
                   >
                     {item.action}
                   </button>
@@ -331,7 +347,7 @@ export default function AdminDashboard() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-2 rounded-md shadow-sm bg-white hover:bg-blue-50 text-[#004aad] border border-[#004aad] font-medium text-sm transition-colors duration-200 text-center"
+                  className="px-4 py-2 rounded-md shadow-sm bg-white hover:bg-[#004aad] hover:text-white text-[#004aad] border border-[#004aad] font-semibold text-sm transition-all duration-200 text-center"
                 >
                   {link.label}
                 </a>
