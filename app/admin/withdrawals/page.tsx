@@ -104,7 +104,8 @@ export default function WithdrawalsPage() {
   if (loading)
     return (
       <div className="p-6 flex items-center gap-2 text-sm text-gray-600">
-        <FiLoader className="animate-spin text-blue-600" /> Loading withdrawals...
+        <FiLoader className="animate-spin text-blue-600" /> Loading
+        withdrawals...
       </div>
     );
 
@@ -119,7 +120,9 @@ export default function WithdrawalsPage() {
       <h1 className="text-2xl font-bold text-blue-700">Withdrawals</h1>
 
       <div className="mb-4">
-        <label className="mr-2 font-medium text-gray-700">Filter by status:</label>
+        <label className="mr-2 font-medium text-gray-700">
+          Filter by status:
+        </label>
         <select
           className="px-3 py-2 border border-blue-500 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
           value={statusFilter}
@@ -136,7 +139,8 @@ export default function WithdrawalsPage() {
 
       {withdrawals.length === 0 ? (
         <p className="text-gray-500 italic">
-          No <span className="font-semibold">{statusFilter}</span> withdrawal requests.
+          No <span className="font-semibold">{statusFilter}</span> withdrawal
+          requests.
         </p>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow-lg border border-gray-200">
@@ -160,27 +164,29 @@ export default function WithdrawalsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${statusColorMap[w.status]}`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        statusColorMap[w.status]
+                      }`}
                     >
                       {w.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 space-x-2">
+                  <td className="px-4 py-3">
                     {w.status === "pending" && (
-                      <>
+                      <div className="flex flex-col md:flex-row gap-2">
                         <button
                           onClick={() => updateStatus(w._id, "approve")}
-                          className="px-3 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow"
+                          className="px-3 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow w-full md:w-auto"
                         >
                           <FiCheck className="inline mr-1" /> Approve
                         </button>
                         <button
                           onClick={() => updateStatus(w._id, "reject")}
-                          className="px-3 py-1 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md shadow"
+                          className="px-3 py-1 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md shadow w-full md:w-auto"
                         >
                           <FiX className="inline mr-1" /> Reject
                         </button>
-                      </>
+                      </div>
                     )}
                   </td>
                 </tr>
