@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import useAuth from "@/hooks/useAuth";
-import { showSuccess, showError } from "@/utils/toast";
+import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -9,6 +9,8 @@ const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 export default function AdminRoutesPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
+
   const [routes, setRoutes] = useState<any[]>([]);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -33,24 +35,29 @@ export default function AdminRoutesPage() {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) setRoutes(data.data);
-          else setError("Failed to load routes");
+          else {
+            setError("Failed to load routes");
+            showError("Failed to load routes");
+          }
         })
-        .catch(() => setError("Server error while fetching routes"));
+        .catch(() => {
+          setError("Server error while fetching routes");
+          showError("Server error while fetching routes");
+        });
     }
-  }, [user]);
+  }, [user, showError]);
 
   const deleteRoute = async (id: string) => {
     if (!confirm("Are you sure you want to delete this route?")) return;
 
     try {
-      const res = await fetch(
-        `${baseUrl}/api/v1/admin/routes/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${baseUrl}/api/v1/admin/routes/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
       const data = await res.json();
+
       if (res.ok) {
         setRoutes((prev) => prev.filter((r) => r._id !== id));
         showSuccess("Route deleted successfully");
@@ -83,6 +90,7 @@ export default function AdminRoutesPage() {
           studentDiscount: parseFloat(form.studentDiscount),
         }),
       });
+
       const data = await res.json();
       if (res.ok) {
         setRoutes((prev) => [data.data, ...prev]);
@@ -116,19 +124,16 @@ export default function AdminRoutesPage() {
     if (!editingRoute) return;
 
     try {
-      const res = await fetch(
-        `${baseUrl}/admin/routes/${editingRoute._id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            ...form,
-            price: parseFloat(form.price),
-            studentDiscount: parseFloat(form.studentDiscount),
-          }),
-        }
-      );
+      const res = await fetch(`${baseUrl}/admin/routes/${editingRoute._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          ...form,
+          price: parseFloat(form.price),
+          studentDiscount: parseFloat(form.studentDiscount),
+        }),
+      });
       const data = await res.json();
       if (res.ok) {
         setRoutes((prev) =>
@@ -151,9 +156,7 @@ export default function AdminRoutesPage() {
   };
 
   if (loading || !user)
-    return (
-      <div className="p-6 text-[#004aad] font-semibold">Loading...</div>
-    );
+    return <div className="p-6 text-[#004aad] font-semibold">Loading...</div>;
 
   return (
     <div className="p-6">
@@ -172,26 +175,26 @@ export default function AdminRoutesPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
-              className="input input-bordered border-[#004aad] focus:border-[#004aad] focus:ring-[#004aad]"
+              className="input input-bordered border-[#004aad]"
               placeholder="Start Point"
               value={form.startPoint}
               onChange={(e) => setForm({ ...form, startPoint: e.target.value })}
             />
             <input
-              className="input input-bordered border-[#004aad] focus:border-[#004aad] focus:ring-[#004aad]"
+              className="input input-bordered border-[#004aad]"
               placeholder="End Point"
               value={form.endPoint}
               onChange={(e) => setForm({ ...form, endPoint: e.target.value })}
             />
             <input
-              className="input input-bordered border-[#004aad] focus:border-[#004aad] focus:ring-[#004aad]"
+              className="input input-bordered border-[#004aad]"
               placeholder="Price"
               type="number"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
             />
             <input
-              className="input input-bordered border-[#004aad] focus:border-[#004aad] focus:ring-[#004aad]"
+              className="input input-bordered border-[#004aad]"
               placeholder="Student Discount (%)"
               type="number"
               value={form.studentDiscount}
@@ -204,13 +207,13 @@ export default function AdminRoutesPage() {
             {editingRoute ? (
               <>
                 <button
-                  className="btn btn-secondary border-[#004aad] text-[#004aad] hover:bg-[#004aad] hover:text-white"
+                  className="btn btn-secondary border-[#004aad] text-[#004aad]"
                   onClick={() => setEditingRoute(null)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="btn btn-primary bg-[#004aad] border-[#004aad] hover:bg-[#003680]"
+                  className="btn btn-primary bg-[#004aad] border-[#004aad]"
                   onClick={updateRoute}
                 >
                   Save Changes
@@ -218,7 +221,7 @@ export default function AdminRoutesPage() {
               </>
             ) : (
               <button
-                className="btn btn-primary bg-[#004aad] border-[#004aad] hover:bg-[#003680]"
+                className="btn btn-primary bg-[#004aad] border-[#004aad]"
                 onClick={createRoute}
               >
                 Create Route
@@ -247,13 +250,13 @@ export default function AdminRoutesPage() {
               </p>
               <div className="card-actions justify-end">
                 <button
-                  className="btn btn-sm btn-outline border-[#004aad] text-[#004aad] hover:bg-[#004aad] hover:text-white"
+                  className="btn btn-sm btn-outline border-[#004aad] text-[#004aad]"
                   onClick={() => handleEditClick(route)}
                 >
                   Edit
                 </button>
                 <button
-                  className="btn btn-sm btn-outline border-[#f80b0b] text-[#f80b0b] hover:bg-[#f80b0b] hover:text-white"
+                  className="btn btn-sm btn-outline border-[#f80b0b] text-[#f80b0b]"
                   onClick={() => deleteRoute(route._id)}
                 >
                   Delete
