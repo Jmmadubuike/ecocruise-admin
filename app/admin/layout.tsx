@@ -1,4 +1,3 @@
-// File: components/layouts/AdminLayout.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,39 +11,33 @@ import {
   FiTruck,
   FiPieChart,
   FiDollarSign,
-  FiMenu,
-  FiChevronDown,
-  FiLogOut,
   FiSettings,
-  FiX,
+  FiLogOut,
 } from "react-icons/fi";
 import { FiCreditCard } from "react-icons/fi";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const navLinks = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: <FiHome className="w-5 h-5" /> },
-  { label: "Routes", href: "/admin/routes", icon: <FiMap className="w-5 h-5" /> },
-  { label: "Users", href: "/admin/users", icon: <FiUsers className="w-5 h-5" /> },
-  { label: "Wallet Update", href: "/admin/wallet", icon: <FiCreditCard className="w-5 h-5" /> },
-  { label: "Tickets", href: "/admin/tickets", icon: <FiTruck className="w-5 h-5" /> },
-  { label: "Analytics", href: "/admin/analytics", icon: <FiPieChart className="w-5 h-5" /> },
-  { label: "Withdrawals", href: "/admin/withdrawals", icon: <FiDollarSign className="w-5 h-5" /> },
+  { label: "Dashboard", href: "/admin/dashboard", icon: FiHome },
+  { label: "Routes", href: "/admin/routes", icon: FiMap },
+  { label: "Users", href: "/admin/users", icon: FiUsers },
+  { label: "Wallet Update", href: "/admin/wallet", icon: FiCreditCard },
+  { label: "Tickets", href: "/admin/tickets", icon: FiTruck },
+  { label: "Analytics", href: "/admin/analytics", icon: FiPieChart },
+  { label: "Withdrawals", href: "/admin/withdrawals", icon: FiDollarSign },
 ];
 
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, fetchUser } = useAuth();
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, fetchUser } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const isActive = (href: string) => pathname.startsWith(href);
 
   const handleLogout = async () => {
     await fetch(`${baseUrl}/auth/logout`, {
@@ -55,26 +48,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push("/login");
   };
 
-  const isActive = (href: string) => pathname.startsWith(href);
-
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-60 h-full bg-white border-r shadow-sm">
         <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
-          <h4 className="uppercase text-xs text-gray-400 tracking-widest px-2 mb-3">Menu</h4>
-          {navLinks.map(({ href, label, icon }) => (
+          <h4 className="uppercase text-xs text-gray-400 tracking-widest px-2 mb-3">
+            Menu
+          </h4>
+          {navLinks.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
-              onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 isActive(href)
                   ? "bg-primary/10 text-primary border-l-4 border-primary"
                   : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              <span className={`${isActive(href) ? "text-primary" : "text-gray-500"} w-5 h-5`}>{icon}</span>
+              <Icon
+                className={`w-5 h-5 ${
+                  isActive(href) ? "text-primary" : "text-gray-500"
+                }`}
+              />
               {label}
             </Link>
           ))}
@@ -94,53 +90,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Mobile Sidebar */}
-      <aside
-        className={`md:hidden fixed z-40 top-0 left-0 h-screen w-72 bg-white border-r shadow-md transform transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+      {/* Mobile Bottom Nav */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow md:hidden flex justify-around items-center px-2 py-2"
+        aria-label="Bottom Navigation"
       >
-        <div className="p-5 border-b flex items-center justify-between">
-          <button onClick={() => setSidebarOpen(false)} className="text-gray-700">
-            <FiX className="w-6 h-6" />
-          </button>
-        </div>
-        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
-          {navLinks.map(({ href, label, icon }) => (
+        {navLinks.map(({ href, label, icon: Icon }) => {
+          const active = isActive(href);
+          return (
             <Link
               key={href}
               href={href}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                isActive(href)
-                  ? "bg-primary/10 text-primary border-l-4 border-primary"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              className={`flex flex-col items-center justify-center flex-1 min-w-0 px-1 py-1 text-xs font-medium transition ${
+                active ? "text-primary" : "text-gray-600 hover:text-primary"
               }`}
             >
-              <span className={`${isActive(href) ? "text-primary" : "text-gray-500"} w-5 h-5`}>{icon}</span>
-              {label}
+              <Icon
+                className={`w-5 h-5 mb-0.5 ${
+                  active ? "text-primary" : "text-gray-500"
+                }`}
+              />
+              <span className="hidden sm:inline truncate">{label}</span>
             </Link>
-          ))}
-          <div className="mt-6 border-t pt-4">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50"
-            >
-              <FiLogOut className="w-4 h-4" />
-              Logout
-            </button>
-          </div>
-        </nav>
-      </aside>
+          );
+        })}
 
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-30 md:hidden backdrop-blur-sm"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+        {/* Logout Icon (mobile only) */}
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center justify-center flex-1 min-w-0 px-1 py-1 text-xs font-medium text-red-600 hover:text-red-700"
+        >
+          <FiLogOut className="w-5 h-5 mb-0.5" />
+          <span className="hidden sm:inline">Logout</span>
+        </button>
+      </nav>
 
-      <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto p-6 pb-20 md:pb-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
